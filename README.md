@@ -1,3 +1,5 @@
+![](https://github.com/GlitchyPSIX/NGIO.NET/blob/main/.github/banner.png?raw=true)
+
 # Newgrounds.io .NET
 
 A C# library intended to allow usage of the [Newgrounds.io API](https://newgrounds.io) in .NET environments. The library itself is built against .NET Standard 2.0, which allows it to be used in a lot of places given the target platform has a Communicator implementation that can handle its asynchronous HTTP calls (e.g. Task in Task Communicator, Coroutine in Unity) or even its own JSON (de)serialization (by default, Newtonsoft.Json is the JSON library for (de)serialization, required dependency.)
