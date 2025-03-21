@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using NewgroundsIODotNet.Components.Interfaces;
 using NewgroundsIODotNet.Components.Requests.App;
 using NewgroundsIODotNet.Components.Requests.CloudSave;
@@ -22,6 +20,7 @@ using NewgroundsIODotNet.Components.Responses.ScoreBoard;
 using NewgroundsIODotNet.Converters;
 using NewgroundsIODotNet.DataModels;
 using NewgroundsIODotNet.Enums;
+using NewgroundsIODotNet.Logging;
 
 namespace NewgroundsIODotNet {
     public abstract class NgioCommunicator {
@@ -41,7 +40,7 @@ namespace NewgroundsIODotNet {
         /// </summary>
         public bool Secured { get; } // avoid exposing string of encryption key once created, just in case
         /// <summary>
-        /// Toggles NG's debug mode
+        /// Toggles NGIO's debug mode
         /// </summary>
         public bool DebugMode { get; set; }
 
@@ -180,6 +179,11 @@ namespace NewgroundsIODotNet {
         public event EventHandler<INgioComponentResponse[]> ComponentResponseError;
 
         /// <summary>
+        /// Fires when anywhere within the code a Log is sent.
+        /// </summary>
+        public event EventHandler<LogInfo> LogMessageReceived;
+
+        /// <summary>
         /// Fires the moment the communicator signals Ready.
         /// </summary>
         public event EventHandler Ready;
@@ -243,34 +247,60 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
-        /// Gets the info of a preloaded medal.
+        /// Triggers the event in which an instance of the Communicator sends a log to console, event log, etc.
+        /// </summary>
+        /// <param name="message">Message to log</param>
+        /// <param name="context">Additional context to the log, such as an Exception or something of the sort.</param>
+        /// <param name="severity">Severity of the log. How this is handled is dependent on the target platform.</param>
+        public virtual void OnLogMessage(string message, object context, LogSeverity severity = LogSeverity.Info) {
+            LogMessageReceived?.Invoke(this, new LogInfo {
+                Message = message,
+                Context = context,
+                Severity = severity
+            });
+        }
+
+        /// <summary>
+        /// Gets the info of a preloaded medal. Returns null on failure.
         /// </summary>
         /// <param name="id">Medal ID</param>
         /// <returns>The found medal.</returns>
-        /// <exception cref="ApplicationException">Thrown when there's no user or medals have not been preloaded.</exception>
-        /// <exception cref="ArgumentException">Thrown when medals haven't been preloaded.</exception>
-        public Medal GetMedal(int id) {
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Medals disabled: no user.");
-            if (!MedalsPreloaded) throw new ApplicationException("NGIO.NET: Medals have not been preloaded.");
+        public Medal? GetMedal(int id) {
+            if (!HasUser) {
+                OnLogMessage("NGIO.NET: Medals disabled: no user.", null, LogSeverity.Warning);
+                return null;
+            }
+            if (!MedalsPreloaded) {
+                OnLogMessage("NGIO.NET: Medals have not been preloaded.", null, LogSeverity.Warning);
+                return null;
+            }
             bool medalExists = LoadedMedals.TryGetValue(id, out Medal foundMedal);
-            if (!medalExists) throw new ArgumentException($"NGIO.NET: Medal #{id} not found.");
+
+            if (!medalExists) {
+                OnLogMessage($"NGIO.NET: Medal #{id} not found.", null, LogSeverity.Error);
+                return null;
+            }
+
             return foundMedal;
         }
 
         /// <summary>
-        /// Unlocks a Medal.
+        /// Attempts to unlock a Medal.
         /// </summary>
         /// <param name="medal">The Medal to unlock.</param>
         /// <param name="responseCallback">Callback to execute when the medal is unlocked</param>
-        /// <exception cref="Exception">Thrown when the Medal could not be unlocked.</exception>
         public void UnlockMedal(Medal medal, Action<Medal> responseCallback = null) {
             if (medal.Unlocked.HasValue && (bool)medal.Unlocked) return; // no use in re-unlocking an unlocked medal
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Medals disabled: no user.");
+            if (!HasUser) {
+                OnLogMessage("NGIO.NET: Medals disabled: no user.", null, LogSeverity.Warning);
+                return;
+            }
             SendRequest(new MedalUnlockRequest(medal.Id), (serverResponse) => {
                 MedalUnlockResponse medalResp = serverResponse.GetComponentResult<MedalUnlockResponse>();
                 if (!medalResp.Success) {
                     UserWriteFailure?.Invoke(this, medalResp);
-                    throw new Exception($"NGIO.NET: Wasn't able to unlock medal {medal.Name}");
+                    OnLogMessage($"NGIO.NET: Wasn't able to unlock medal {medal.Name}", serverResponse, LogSeverity.Error);
+                    return;
                 }
 
                 LastUnlockedMedal = medalResp.Medal;
@@ -280,17 +310,26 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
-        /// Gets the info of a Cloud Save slot.
+        /// Gets the info of a Cloud Save slot. Returns null on failure.
         /// </summary>
         /// <param name="id">ID of the Cloud Save slot</param>
         /// <returns>The info for the Save Slot</returns>
         /// <exception cref="ApplicationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SaveSlot GetSaveSlot(int id) {
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Save Slots disabled: no user.");
-            if (!SaveSlotsPreloaded) throw new ApplicationException("NGIO.NET: Save Slots have not been preloaded.");
+        public SaveSlot? GetSaveSlot(int id) {
+            if (!HasUser) {
+                OnLogMessage("NGIO.NET: Save Slots disabled: no user.", null, LogSeverity.Warning);
+                return null;
+            }
+            if (!SaveSlotsPreloaded) {
+                OnLogMessage("NGIO.NET: Save Slots have not been preloaded.", null, LogSeverity.Warning);
+                return null;
+            }
             bool saveExists = LoadedSaveSlots.TryGetValue(id, out SaveSlot foundSlot);
-            if (!saveExists) throw new ArgumentException($"NGIO.NET: Save slot #{id} not found.");
+            if (!saveExists) {
+                OnLogMessage($"NGIO.NET: Save slot #{id} not found.", null, LogSeverity.Error);
+                return null;
+            }
             return foundSlot;
         }
 
@@ -300,16 +339,18 @@ namespace NewgroundsIODotNet {
         /// <param name="slot">Save Slot to save to.</param>
         /// <param name="data">Data to save in the Save Slot</param>
         /// <param name="responseCallback">Callback to execute when data is received</param>
-        /// <exception cref="ApplicationException"></exception>
-        /// <exception cref="ArgumentException"></exception>
         public void SetSaveSlot(SaveSlot slot, string data, Action<SaveSlot?> responseCallback = null) {
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Save Slots disabled: no user.");
+            if (!HasUser) {
+                OnLogMessage("NGIO.NET: Save Slots disabled: no user.", null, LogSeverity.Warning);
+                return;
+            }
             SendRequest(new CloudSaveSetDataRequest(data, slot.Id), (response) => {
                 CloudSaveSlotResponse resp = response.GetComponentResult<CloudSaveSlotResponse>();
                 if (!resp.Success) {
-                    responseCallback?.Invoke(null);
                     UserWriteFailure?.Invoke(this, resp);
-                    throw new ArgumentException($"NGIO.NET: Saving to slot #{slot.Id} failed: {resp.Error?.Message}");
+                    responseCallback?.Invoke(null);
+                    OnLogMessage($"NGIO.NET: Saving to slot #{slot.Id} failed: {resp.Error?.Message}", null, LogSeverity.Error);
+                    return;
                 }
 
                 LastSlotSaved = resp.Slot;
@@ -320,7 +361,7 @@ namespace NewgroundsIODotNet {
         /// <summary>
         /// Gets the data from the Save Slot.
         /// </summary>
-        /// <remarks>All Cloud Save data is stored as strings.</remarks>
+        /// <remarks>All Cloud Save data is stored as <seealso cref="string">string</seealso>.</remarks>
         /// <param name="slot">The Save slot to get data from.</param>
         /// <param name="responseCallback">Callback to execute when the data arrives.</param>
         public abstract void GetSaveSlotData(SaveSlot slot, Action<string> responseCallback = null);
@@ -349,7 +390,8 @@ namespace NewgroundsIODotNet {
                 if (loaderResponse.Success)
                     OpenUrl(loaderResponse.Url);
                 else {
-                    throw new ArgumentException($"NGIO.NET: Loading referral {referral} failed.");
+                    OnLogMessage($"NGIO.NET: Loading referral {referral} failed.", null, LogSeverity.Error);
+                    return;
                 }
             });
         }
@@ -364,8 +406,9 @@ namespace NewgroundsIODotNet {
             SendRequest(new EventLogEventRequest(_host, eventId), (response) => {
                 EventLogEventResponse evtResponse = response.GetComponentResult<EventLogEventResponse>();
                 if (!evtResponse.Success) {
-                    throw new Exception(
-                        $"NGIO.NET: Logging event with ID {eventId} failed: {evtResponse.Error?.Message}");
+                    OnLogMessage($"NGIO.NET: Logging event with ID {eventId} failed: {evtResponse.Error?.Message}",
+                        null, LogSeverity.Error);
+                    return;
                 }
 
                 responseCallback?.Invoke(evtResponse);
@@ -381,8 +424,10 @@ namespace NewgroundsIODotNet {
             SendRequest(new GatewayGetDateTimeRequest(), (response) => {
                 GatewayGetDateTimeResponse dtResponse = response.GetComponentResult<GatewayGetDateTimeResponse>();
                 if (!dtResponse.Success) {
-                    throw new Exception(
-                        $"NGIO.NET: SOMEHOW getting the date-time from the server failed: {dtResponse.Error?.Message}");
+                    // if getting the datetime fails then we might be having bigger problems.
+                    OnLogMessage($"NGIO.NET: SOMEHOW getting the date-time from the server failed: {dtResponse.Error?.Message}",
+                        null, LogSeverity.Critical);
+                    return;
                 }
 
                 responseCallback?.Invoke(dtResponse.Date);
@@ -390,16 +435,24 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
-        /// Gets the info of a Scoreboard.
+        /// Gets the info of a Scoreboard. Returns null if unsuccessful.
         /// </summary>
         /// <param name="id">ID of the Scoreboard</param>
         /// <returns>The info for the Scoreboard</returns>
         /// <exception cref="ApplicationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public ScoreBoard GetScoreboard(int id) {
-            if (!ScoreboardsPreloaded) throw new ApplicationException("NGIO.NET: Scoreboards have not been preloaded.");
+        public ScoreBoard? GetScoreboard(int id) {
+            if (!ScoreboardsPreloaded) {
+                OnLogMessage("NGIO.NET: Scoreboards have not been preloaded.",
+                    null, LogSeverity.Warning);
+                return null;
+            }
             bool sbExists = LoadedScoreboards.TryGetValue(id, out ScoreBoard foundScoreboard);
-            if (!sbExists) throw new ArgumentException($"NGIO.NET: Scoreboard {id} not found.");
+            if (!sbExists) {
+                OnLogMessage($"NGIO.NET: Scoreboard {id} not found.",
+                    null, LogSeverity.Error);
+                return null;
+            }
             return foundScoreboard;
         }
 
@@ -413,30 +466,61 @@ namespace NewgroundsIODotNet {
         /// <param name="filterTag">Tag to filter scores with</param>
         /// <param name="responseCallback" >Callback to execute when data is received</param>
         /// <returns>The info for the Scoreboard</returns>
-        /// <exception cref="Exception">Thrown when there's an issue getting the scoreboards.</exception>
         public void GetScoreboardScores(ScoreBoard scoreBoard, ScoreBoardPeriod period = ScoreBoardPeriod.Day, int limit = 10, int skip = 0, bool social = false,
             string filterTag = null, Action<ScoreBoardGetScoresResponse> responseCallback = null) {
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Scoreboards disabled: no user.");
-            SendRequest(new ScoreBoardGetScoresRequest(scoreBoard.Id, null, limit, period, skip, social, filterTag),
+            if (!HasUser && social) {
+                OnLogMessage($"NGIO.NET: Trying to get scoreboard scores without logged-in user, but was requested to load social scores. Ignoring...",
+                    null, LogSeverity.Warning);
+            }
+            SendRequest(new ScoreBoardGetScoresRequest(scoreBoard.Id, null, limit, period, skip, social && HasUser, filterTag),
                 response => {
                     ScoreBoardGetScoresResponse scoresResponse =
                         response.GetComponentResult<ScoreBoardGetScoresResponse>();
-                    if (!scoresResponse.Success)
-                        throw new Exception($"NGIO.NET: Failure getting scores: {scoresResponse.Error?.Message}");
+                    if (!scoresResponse.Success) {
+                        OnLogMessage($"NGIO.NET: Failure getting scores: {scoresResponse.Error?.Message}",
+                            null, LogSeverity.Error);
+                        return;
+                    }
 
                     LastScoresResult = (scoresResponse.Scores, scoresResponse.Period);
                     responseCallback?.Invoke(scoresResponse);
                 });
         }
 
+        /// <summary>
+        /// Posts a score to a given scoreboard.
+        /// </summary>
+        /// <remarks><para>
+        /// <b>NOTE:</b> Depending on your Scoreboard display setting, the argument <c>amount</c> might be interpreted differently:
+        /// </para>
+        /// <para>
+        /// - Simple: interpreted as-is, displayed as-is.<br/>
+        /// - Decimal: interpreted as-is, displayed as  <c>amount</c> divided by 100.<br/>
+        /// - Currency: interpreted as-is, displayed like Decimal with a "$" symbol as prefix.<br/>
+        /// - Time: <c>amount</c> is interpreted as milliseconds, displayed as HH:mm:ss.SS .<br/>
+        /// - Distance: <c>amount</c> is interpreted as inches, displayed as ft' in''.<br/>
+        /// - Metric Distance (m): <c>amount</c> is interpreted as centimeters, displayed as meters.<br/>
+        /// - Metric distance (km): <c>amount</c> is interpreted as meters, displayed as kilometers.
+        /// </para></remarks>
+        /// <param name="scoreBoard"></param>
+        /// <param name="amount"></param>
+        /// <param name="tag"></param>
+        /// <param name="responseCallback"></param>
         public void PostScore(ScoreBoard scoreBoard, int amount, string tag = null, Action<Score?> responseCallback = null) {
-            if (!HasUser) throw new ApplicationException("NGIO.NET: Scoreboard posting disabled: no user.");
+            if (!HasUser) {
+                OnLogMessage("NGIO.NET: Scoreboard posting disabled: no user.",
+                    null, LogSeverity.Warning);
+                return;
+            }
             SendRequest(new ScoreBoardPostScoreRequest(scoreBoard.Id, amount, tag), (response) => {
                 ScoreBoardPostScoreResponse resp = response.GetComponentResult<ScoreBoardPostScoreResponse>();
                 if (!resp.Success) {
-                    responseCallback?.Invoke(null);
                     UserWriteFailure?.Invoke(this, resp);
-                    throw new ArgumentException($"NGIO.NET: Posting score {amount} to Scoreboard #{scoreBoard.Id} failed: {resp.Error?.Message}");
+                    responseCallback?.Invoke(null);
+
+                    OnLogMessage($"NGIO.NET: Posting score {amount} to Scoreboard #{scoreBoard.Id} failed: {resp.Error?.Message}",
+                        resp, LogSeverity.Error);
+                    return;
                 }
 
                 LastScorePosted = resp.Score;
@@ -445,7 +529,7 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
-        /// Resets login, session, caches for saves/medals/scores and login-skip state.
+        /// Resets login, session, caches for last saves/medals/scores and login-skip state.
         /// </summary>
         public void ResetConnectionState() {
             LoginSkipped = false;
@@ -504,12 +588,14 @@ namespace NewgroundsIODotNet {
         /// <summary>
         /// Skips login, sets NGIO.NET to be ready with no session. Scoreboards and medals disabled.
         /// </summary>
-        /// <exception cref="Exception">Thrown if skipping is attempted while login is required.</exception>
         public void SkipLogin() {
             if (ConnectionStatus == ConnectionStatus.Ready) return;
             if (ConnectionStatus != ConnectionStatus.LoginRequired
-                || ConnectionStatus != ConnectionStatus.LoginCancelled)
-                throw new Exception("NGIO.NET: attempted to skip login without login required");
+                || ConnectionStatus != ConnectionStatus.LoginCancelled) {
+                OnLogMessage("NGIO.NET: attempted to skip login without login required",
+                    null, LogSeverity.Warning);
+                return;
+            }
 
             ConnectionStatus = ConnectionStatus.Ready;
             Ready?.Invoke(this, EventArgs.Empty);
@@ -611,6 +697,7 @@ namespace NewgroundsIODotNet {
             ResponseReceived?.Invoke(this, response);
             CheckForErrors(response);
 
+            if (response.Results == null) return;
             foreach (INgioComponentResponse compResponse in response.Results) {
                 switch (compResponse) {
                     case INgioSessionResponse sessResp:
@@ -659,9 +746,11 @@ namespace NewgroundsIODotNet {
             if (!response.Success) {
                 ResponseError?.Invoke(this, response);
                 switch (response.Error?.ErrorCode) {
-                    case NgioErrorCode.Unknown:
-                        throw new WarningException(
-                            $"NGIO.NET: Error code {response.Error?.Code} is not known by NGIO.NET. Message is: {response.Error?.Message}");
+                    case NgioErrorCode.Unknown: {
+                            OnLogMessage($"NGIO.NET: Error code {response.Error?.Code} is not known by NGIO.NET. Message is: {response.Error?.Message}",
+                                response, LogSeverity.Warning);
+                            return;
+                        }
                     case NgioErrorCode.ServerUnavailable: // stop everything
                         ConnectionStatus = ConnectionStatus.ServerUnavailable;
                         StopHeartbeat();
@@ -676,10 +765,10 @@ namespace NewgroundsIODotNet {
                 ComponentResponseError?.Invoke(this, erroredComponents);
 
                 if (erroredComponents.Any(errComp => errComp.Error?.ErrorCode == NgioErrorCode.Unknown)) {
-                    throw new WarningException(
-                        $"NGIO.NET: One or more components returned errors unknown to NGIO.NET. Check the InnerException property to see which.",
+                    OnLogMessage($"NGIO.NET: One or more components returned errors unknown to NGIO.NET. Context is an AggregateException with all of them.",
                         new AggregateException(erroredComponents.Select(comp =>
-                            new WarningException($"{comp.Component} - ({comp.Error?.Code}) {comp.Error?.Message}"))));
+                            new WarningException($"{comp.Component} - ({comp.Error?.Code}) {comp.Error?.Message}"))), LogSeverity.Warning);
+                    return;
                 }
 
                 if (erroredComponents.Any(errComp => errComp.Error?.ErrorCode == NgioErrorCode.ServerUnavailable)) {
@@ -767,7 +856,9 @@ namespace NewgroundsIODotNet {
                 }
                 else {
                     ConnectionStatus = ConnectionStatus.LoginFailed;
-                    throw new Exception("NGIO.NET: Preloading failed when trying to get medals, scoreboards and saves. (server said no success)");
+                    OnLogMessage("NGIO.NET: Preloading failed when trying to get medals, scoreboards and saves. (server said no success)",
+                        null, LogSeverity.Warning);
+                    return;
                 }
 
             });

@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Runtime.CompilerServices;
 using NewgroundsIODotNet.Components.Interfaces;
 using NewgroundsIODotNet.DataModels;
 using Newtonsoft.Json;

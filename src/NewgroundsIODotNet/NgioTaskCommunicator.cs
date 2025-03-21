@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using NewgroundsIODotNet.Components.Interfaces;
 using NewgroundsIODotNet.DataModels;
 using NewgroundsIODotNet.Enums;
+using NewgroundsIODotNet.Logging;
 using Newtonsoft.Json;
 
-namespace NewgroundsIODotNet {
+namespace NewgroundsIODotNet
+{
     /// <summary>
     /// Communicator implementation for use in Desktop/Task supported platforms (Windows, Linux, Unity Desktop).
     /// </summary>
@@ -33,7 +35,7 @@ namespace NewgroundsIODotNet {
         /// <param name="sessionId">Optional session ID to pass and use right after initialization. Usually given by Newgrounds through the browser.</param>
         /// <param name="host">Where your game is running. Extract this from the browser's URI. Defaults to "localhost".</param>
         public NgioTaskCommunicator(string appId, string encryptionKey, string appVersion, bool debugMode = false,
-            bool preloadMedals = false, bool preloadScores = false, string sessionId = null, string host = "localhost") : base(appId, encryptionKey, appVersion, debugMode,
+            bool preloadMedals = false, bool preloadScores = false, bool logViewOnInit = true, string sessionId = null, string host = "localhost") : base(appId, encryptionKey, appVersion, debugMode,
             preloadMedals, preloadScores, true, sessionId, host) {
             _httpClient.BaseAddress = new Uri(NewgroundsGatewayUrl);
         }
@@ -156,6 +158,7 @@ namespace NewgroundsIODotNet {
             }
             catch {
                 OnServerUnavailable();
+                StopHeartbeat();
                 ConnectionStatus = ConnectionStatus.ServerUnreachable;
             }
 
@@ -175,8 +178,10 @@ namespace NewgroundsIODotNet {
             else {
                 OnCommunicationError();
                 ConnectionStatus = ConnectionStatus.ServerUnavailable;
-                throw new HttpRequestException(
-                    $"NGIO.NET: NG Connectivity error, sending request to Newgrounds.io returned {resp?.StatusCode}");
+                StopHeartbeat();
+                OnLogMessage($"NGIO.NET: NG Connectivity error, sending request to Newgrounds.io returned {resp?.StatusCode}",
+                    null, LogSeverity.Critical);
+                return null;
             }
         }
 
