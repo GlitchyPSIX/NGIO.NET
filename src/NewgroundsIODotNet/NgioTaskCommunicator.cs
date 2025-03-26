@@ -100,6 +100,10 @@ namespace NewgroundsIODotNet
             Task.Run(() => InfiniteHeartbeat(_cToken.Token));
         }
 
+        public override void SetHeartbeatSpeed(float newSeconds) {
+            _heartbeatLength = newSeconds;
+        }
+
         public override void StopHeartbeat() {
             _cToken.Cancel();
         }

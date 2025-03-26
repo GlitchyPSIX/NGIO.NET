@@ -11,7 +11,6 @@ namespace NewgroundsIODotNet.Converters
         public override bool CanWrite => false;
         
         public override void WriteJson(JsonWriter writer, NgioServerResponse value, JsonSerializer serializer) { }
-        private JsonSerializer defaultSerializer = new JsonSerializer();
 
         public override NgioServerResponse ReadJson(JsonReader reader, Type objectType,
             NgioServerResponse existingValue, bool hasExistingValue,
@@ -19,9 +18,6 @@ namespace NewgroundsIODotNet.Converters
             JObject jObj = JObject.Load(reader);
 
             JToken results = jObj.GetValue("result");
-
-            if (results == null)
-                throw new SerializationException("NG.IO returned a response with null component call result.");
 
             if (results is JObject resultObj) {
                 // JObject?
@@ -40,7 +36,7 @@ namespace NewgroundsIODotNet.Converters
                 jObj.GetValue("success").ToObject<bool>(),
                 jObj.GetValue("error")?.ToObject<NgioServerError?>(),
                 jObj.GetValue("echo")?.ToString(),
-                jObj.GetValue("result").ToObject<INgioComponentResponse[]>(serializer),
+                jObj.GetValue("result")?.ToObject<INgioComponentResponse[]>(serializer) ?? Array.Empty<INgioComponentResponse>(), // null response, empty array
                 jObj.GetValue("api_version")?.ToString(),
                 jObj.GetValue("debug")?.ToObject<Debug?>()
                 );

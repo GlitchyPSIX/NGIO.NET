@@ -49,7 +49,19 @@ namespace NewgroundsIODotNet {
         /// </summary>
         public Session? Session { get; protected set; }
 
-        public ConnectionStatus ConnectionStatus { get; protected set; } = ConnectionStatus.Uninitialized;
+        protected ConnectionStatus _connectionStatus = ConnectionStatus.Uninitialized;
+
+        public ConnectionStatus ConnectionStatus {
+            get => _connectionStatus;
+            protected set
+            {
+                if (_connectionStatus != value) {
+                    ConnectionStatusChange?.Invoke(this, value);
+                }
+
+                _connectionStatus = value;
+            }
+        }
 
         /// <summary>
         /// The current User. <c>null</c> if there's nobody logged in.
@@ -187,6 +199,11 @@ namespace NewgroundsIODotNet {
         /// Fires the moment the communicator signals Ready.
         /// </summary>
         public event EventHandler Ready;
+
+        /// <summary>
+        /// Fires whenever the connection status changes.
+        /// </summary>
+        public event EventHandler<ConnectionStatus> ConnectionStatusChange;
 
         protected string _sessionId;
         protected string _host;
@@ -657,6 +674,12 @@ namespace NewgroundsIODotNet {
         /// </summary>
         /// <remarks>Turning this on will keep the session alive by sending Gateway pings every <c>seconds</c>. Normally, a Communicator implementation would send session checks instead if the login page is opened to catch the user info. <see href="https://www.newgrounds.io/help/objects/#Session">Newgrounds.IO Documentation</see></remarks>
         public abstract void StartHeartbeat(float seconds = 10);
+
+        /// <summary>
+        /// Changes the Heartbeat's speed, mostly used to accelerate checking the session when the login page is open.
+        /// </summary>
+        /// <param name="newSeconds"></param>
+        public abstract void SetHeartbeatSpeed(float newSeconds);
 
         /// <summary>
         /// Stops the session heartbeat.
