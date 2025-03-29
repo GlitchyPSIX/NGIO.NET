@@ -25,13 +25,13 @@ namespace NewgroundsIODotNet.DataModels {
         /// If true, the user would like you to remember their session id.
         /// </summary>
         [JsonProperty("remember")]
-        public string RememberSession { get; }
+        public bool RememberSession { get; }
 
         [JsonProperty("user")]
         public User? User { get; }
 
         [JsonConstructor]
-        public Session(bool expired, string id, string passportUrl, string rememberSession, User? user) {
+        public Session(bool expired, string id, string passportUrl, bool rememberSession, User? user) {
             Expired = expired;
             Id = id;
             PassportUrl = passportUrl;
