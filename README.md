@@ -12,13 +12,13 @@ A C# library intended to allow usage of the [Newgrounds.io API](https://newgroun
 | Headless (serverside) | ✅ (Task Communicator, included, no referral links shall open) |
 | Blazor / [KNI](https://github.com/kniEngine/kni) WebGL | ⚠ Untested, Task Communicator likely working |
 | .NET Mobile (MAUI Android, iOS, MonoGame(?) | ⚠ Untested, Task Communicator likely working |
-| Unity Desktop | ✅[^1] 2019.3 minimum (Task Communicator, included) |
-| Unity Mobile | ⚠[^1] Untested, Task Communicator likely working |
-| Unity WebGL | ❌ Requires own Communicator, planned |
+| Unity Desktop | ✅[^1] 2021.3 minimum (Task Communicator, included)<br>[✅ 2021.3 minimum (Unity Coroutine Communicator)](https://github.com/GlitchyPSIX/NGIO.NET-Unity) |
+| Unity Mobile | ⚠[^1] Task Communicator likely working, but untested.<br>[✅ 2021.3 minimum (Unity Coroutine Communicator)](https://github.com/GlitchyPSIX/NGIO.NET-Unity)|
+| Unity WebGL | [✅ 2021.3 minimum (Unity Coroutine Communicator)](https://github.com/GlitchyPSIX/NGIO.NET-Unity) |
 | Godot 3.x | ❌ Requires own Communicator, planned |
 | Godot 4.x | ❌ Likely unviable; [no .NET WebGL export](https://github.com/godotengine/godot/issues/70796) |
 
-[^1]: The core does not yet have an UPM package.
+[^1]: The core does not and will not have have an UPM package. Manual installation is required.
 
 ## Usage
 I haven't written the wiki yet please do not hurt me I will get to it eventually...
