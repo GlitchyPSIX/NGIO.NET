@@ -414,6 +414,24 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
+        /// Loads and opens a Loader URL.
+        /// </summary>
+        /// <param name="type">The type of URL to open</param>
+        /// <param name="logStat">Whether to log this load in the stats.</param>
+        /// <exception cref="ArgumentException">Thrown if the server returns unsuccessful.</exception>
+        public void LoadStandardUrl(StandardLoaderType type, bool logStat) {
+            SendRequest(new LoaderUrlRequest(type, _host, logStat), (response) => {
+                LoaderUrlResponse loaderResponse = response.GetComponentResult<LoaderUrlResponse>();
+                if (loaderResponse.Success)
+                    OpenUrl(loaderResponse.Url);
+                else {
+                    OnLogMessage($"NGIO.NET: Loading URL type {type} failed.", null, LogSeverity.Error);
+                    return;
+                }
+            });
+        }
+
+        /// <summary>
         /// Logs an event with an ID as specified in your Referrals and Events page. <see href="https://www.newgrounds.io/help/components/#event-logevent">Newgrounds.IO Documentation</see>
         /// </summary>
         /// <param name="eventId">ID of the event to log.</param>
