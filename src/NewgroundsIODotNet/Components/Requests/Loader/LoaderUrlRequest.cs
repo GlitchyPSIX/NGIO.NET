@@ -5,9 +5,15 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.Loader
 {
+    /// <summary>
+    /// Request that represents one of the many specific Loader URL types Newgrounds provides.
+    /// </summary>
     public class LoaderUrlRequest : INgioComponentRequest
     {
         public bool RequiresSecureCall => false;
+        /// <summary>
+        /// Type of Loader to represent
+        /// </summary>
         [JsonIgnore] private StandardLoaderType LoaderType { get; }
         public string Component
         {
@@ -32,14 +38,20 @@ namespace NewgroundsIODotNet.Components.Requests.Loader
         /// Component's parameters.
         /// </summary>
         /// <remarks>
-        /// Do <b>NOT</b> modify the "<c>redirect</c>" parameter manually, as it will not return a JSON response if false and the library only handles JSON responses.
+        /// Do <b>NOT</b> modify the "<c>redirect</c>" parameter manually, as it will not return a JSON response if not false and the library only handles JSON responses.
         /// </remarks>
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Host where the game is running
+        /// </summary>
         [JsonIgnore]
         public string Host { get => (string)Parameters["host"]; set => Parameters["host"] = value; }
 
+        /// <summary>
+        /// Whether to log this referral call in Stats
+        /// </summary>
         [JsonIgnore]
         public bool LogStat { get => (bool)Parameters["log_stat"]; set => Parameters["log_stat"] = value; }
 

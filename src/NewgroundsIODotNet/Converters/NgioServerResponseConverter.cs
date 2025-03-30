@@ -7,6 +7,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Converters
 {
+    /// <summary>
+    /// Converts a Response from JSON using JSON.NET. Does not write JSON.
+    /// </summary>
     public class NgioServerResponseConverter : JsonConverter<NgioServerResponse> {
         public override bool CanWrite => false;
         

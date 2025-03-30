@@ -7,15 +7,21 @@ using Newtonsoft.Json.Linq;
 namespace NewgroundsIODotNet.Components.Responses.Event
 {
     /// <summary>
-    /// One Loader URL response to rule them all (they all have the same response.)
+    /// One Logging response to rule them all (they all have the same response.)
     /// </summary>
     public class EventLogEventResponse : INgioComponentResponse
     {
-        public string Component => "Event.logEvent"; // Nonstandard in NG documentation, but I'm making DX more fun by not exaggerating the type amount.
+        /// <summary>
+        /// The value returned by this property in this class is not standard in NG documentation because this is a combined response.
+        /// </summary>
+        public string Component => "Event.logEvent";
         public bool Success { get; }
         public Dictionary<string, object> Data { get; }
         public bool Debug { get; }
         public NgioServerError? Error { get; }
+        /// <summary>
+        /// Event name that was logged
+        /// </summary>
         public string EventName { get; }
 
         /// <summary>

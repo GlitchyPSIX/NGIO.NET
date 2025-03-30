@@ -6,24 +6,36 @@ using NewgroundsIODotNet.DataModels;
 using NewgroundsIODotNet.Enums;
 
 namespace NewgroundsIODotNet.Components.Requests.ScoreBoard {
+    /// <summary>
+    /// Request to get the Scores from a Scoreboard
+    /// </summary>
     public class ScoreBoardGetScoresRequest : INgioComponentRequest {
         public string Component => "ScoreBoard.getScores";
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
         public bool RequiresSecureCall => false;
 
+        /// <summary>
+        /// App ID of another game to get the scores from. Set to null to use the current game
+        /// </summary>
         [JsonIgnore]
         public string AppId {
             get => (string)Parameters["app_id"];
             set => Parameters["app_id"] = value;
         }
 
+        /// <summary>
+        /// ID of the ScoreBoard to get scores from.
+        /// </summary>
         [JsonIgnore]
         public int Id {
             get => (int)Parameters["id"];
             set => Parameters["id"] = value;
         }
 
+        /// <summary>
+        /// How many score entries to fetch
+        /// </summary>
         [JsonIgnore]
         public int Limit {
             get => (int)Parameters["limit"];
@@ -32,6 +44,9 @@ namespace NewgroundsIODotNet.Components.Requests.ScoreBoard {
 
         private ScoreBoardPeriod _period;
 
+        /// <summary>
+        /// Period of time to get the scores from
+        /// </summary>
         [JsonIgnore]
         public ScoreBoardPeriod Period {
             get => _period;
@@ -60,24 +75,37 @@ namespace NewgroundsIODotNet.Components.Requests.ScoreBoard {
             }
         }
 
+        /// <summary>
+        /// How many scores to skip before fetching
+        /// </summary>
         [JsonIgnore]
         public int Skip {
             get => (int)Parameters["skip"];
             set => Parameters["skip"] = value;
         }
 
+        /// <summary>
+        /// Whether the scores will only include the logged in user and their friends
+        /// </summary>
+        /// <remarks>Useless if there's no Session with a specified User.</remarks>
         [JsonIgnore]
         public bool Social {
             get => (bool)Parameters["social"];
             set => Parameters["social"] = value;
         }
 
+        /// <summary>
+        /// Tag to filter scores by.
+        /// </summary>
         [JsonIgnore]
         public string FilterTag {
             get => (string)Parameters["tag"];
             set => Parameters["tag"] = value;
         }
 
+        /// <summary>
+        /// ID or Username of the User to get local stores in relation to.
+        /// </summary>
         [JsonIgnore]
         public string User {
             get => (string)Parameters["user"];

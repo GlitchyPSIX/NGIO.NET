@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.App {
+    /// <summary>
+    /// Request to start a new Session.
+    /// </summary>
     public class AppStartSessionRequest : INgioComponentRequest {
         
         public string Component => "App.startSession";
@@ -10,6 +13,9 @@ namespace NewgroundsIODotNet.Components.Requests.App {
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Creates a new session ending all other sessions created by the user
+        /// </summary>
         [JsonIgnore]
         public bool Force { get => (bool)Parameters["force"]; set => Parameters["force"] = value; }
 

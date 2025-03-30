@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.DataModels {
+    /// <summary>
+    /// Newgrounds.IO Debug object.
+    /// </summary>
     public struct Debug {
         /// <summary>
         /// The time, in milliseconds, that it took to execute a request.

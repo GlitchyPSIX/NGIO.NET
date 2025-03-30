@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.App
 {
+    /// <summary>
+    /// Response from a host license check.
+    /// </summary>
     public class AppGetHostLicenseResponse : INgioComponentResponse {
         public string Component => "App.getHostLicense";
         public bool Success { get; set; }
@@ -13,6 +16,9 @@ namespace NewgroundsIODotNet.Components.Responses.App
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// Whether this host is allowed to run this game.
+        /// </summary>
         [JsonIgnore]
         public bool HostApproved { get; }
 

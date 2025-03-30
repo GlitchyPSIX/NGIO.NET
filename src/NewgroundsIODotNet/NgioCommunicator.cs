@@ -477,6 +477,7 @@ namespace NewgroundsIODotNet {
         /// Gets the scores of a Scoreboard
         /// </summary>
         /// <param name="scoreBoard">Scoreboard to get scores from</param>
+        /// <param name="period">Period from which to get scores</param>
         /// <param name="limit">Limit number of scores returned</param>
         /// <param name="skip">Skip number of scores, used for pagination</param>
         /// <param name="social">Whether to only include the logged in user's friends</param>

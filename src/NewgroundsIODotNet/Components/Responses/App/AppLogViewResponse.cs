@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Responses.App
 {
+    /// <summary>
+    /// Response from a log View event request.
+    /// </summary>
     public class AppLogViewResponse : INgioComponentResponse {
         public string Component => "App.logView";
         public bool Success { get; set; }

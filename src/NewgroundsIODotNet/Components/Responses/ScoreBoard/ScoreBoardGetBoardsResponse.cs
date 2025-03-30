@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Medal
 {
+    /// <summary>
+    /// Response to a request to get the Scoreboards of the game.
+    /// </summary>
     public class ScoreBoardGetBoardsResponse : INgioComponentResponse {
         public string Component => "ScoreBoard.getBoards";
         public bool Success { get; }
@@ -13,6 +16,9 @@ namespace NewgroundsIODotNet.Components.Responses.Medal
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// Received Scoreboards
+        /// </summary>
         public DataModels.ScoreBoard[] ScoreBoards { get; }
 
         /// <summary>

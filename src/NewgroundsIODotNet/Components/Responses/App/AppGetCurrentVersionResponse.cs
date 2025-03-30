@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.App
 {
+    /// <summary>
+    /// Response from a game version check.
+    /// </summary>
     public class AppGetCurrentVersionResponse : INgioComponentResponse {
         public string Component => "App.getCurrentVersion";
         public bool Success { get; set; }
@@ -13,8 +16,15 @@ namespace NewgroundsIODotNet.Components.Responses.App
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// Whether the version provided is considered deprecated
+        /// </summary>
         [JsonIgnore]
         public bool ClientDeprecated { get; }
+
+        /// <summary>
+        /// The current version of the game
+        /// </summary>
         [JsonIgnore]
         public string Version { get; }
 

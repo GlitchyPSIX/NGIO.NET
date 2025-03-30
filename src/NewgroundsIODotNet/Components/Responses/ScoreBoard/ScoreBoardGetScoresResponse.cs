@@ -8,6 +8,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.ScoreBoard
 {
+    /// <summary>
+    /// Response to getting the scores from a Scoreboard.
+    /// </summary>
     public class ScoreBoardGetScoresResponse : INgioComponentResponse {
         public string Component => "ScoreBoard.getScores";
         public bool Success { get; }
@@ -20,15 +23,34 @@ namespace NewgroundsIODotNet.Components.Responses.ScoreBoard
         /// </summary>
         public string AppId { get; }
 
+        /// <summary>
+        /// Scores fetched
+        /// </summary>
         public int Limit { get; }
 
+        /// <summary>
+        /// Period from which the scores were fetched
+        /// </summary>
         public ScoreBoardPeriod Period { get; }
 
+        /// <summary>
+        /// Received scores
+        /// </summary>
         public Score[] Scores { get; }
+
+        /// <summary>
+        /// Scoreboard that was fetched from
+        /// </summary>
         public DataModels.ScoreBoard Scoreboard { get; }
 
+        /// <summary>
+        /// Whether these scores only reflect the user's social circle (friends).
+        /// </summary>
         public bool Social { get; }
 
+        /// <summary>
+        /// User that was considered for the <seealso cref="Social">Social</seealso> parameter.
+        /// </summary>
         public User? User { get; }
 
         /// <summary>

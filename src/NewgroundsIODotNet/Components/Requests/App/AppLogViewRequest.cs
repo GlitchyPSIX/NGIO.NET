@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.App {
+    /// <summary>
+    /// Requests to log a View event to this game.
+    /// </summary>
     public class AppLogViewRequest : INgioComponentRequest {
         
         public string Component => "App.logView";
@@ -10,6 +13,9 @@ namespace NewgroundsIODotNet.Components.Requests.App {
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Host address that is currently hosting the game
+        /// </summary>
         [JsonIgnore]
         public string Host { get => (string)Parameters["host"]; set => Parameters["host"] = value; }
 

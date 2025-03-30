@@ -6,7 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.CloudSave
 {
-    // One cloud save response to merge similar responses
+    /// <summary>
+    /// Response to any request that returns a single Cloud Save as data
+    /// </summary>
     public class CloudSaveSlotResponse : INgioComponentResponse {
         public string Component => "CloudSave.*"; // nonstandard in ng.io documentation but this is a common response
         public bool Success { get; }
@@ -18,6 +20,9 @@ namespace NewgroundsIODotNet.Components.Responses.CloudSave
         /// The App ID of <b>another</b>, approved app to load slot data from.
         /// </summary>
         public string AppId { get; }
+        /// <summary>
+        /// Relevant Cloud Save slot 
+        /// </summary>
         public DataModels.SaveSlot Slot { get; }
 
         /// <summary>

@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.Event {
+    /// <summary>
+    /// Request to log an Event.
+    /// </summary>
     public class EventLogEventRequest : INgioComponentRequest {
 
         public string Component => "Event.logEvent";
@@ -10,9 +13,15 @@ namespace NewgroundsIODotNet.Components.Requests.Event {
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Host where the game is running
+        /// </summary>
         [JsonIgnore]
         public string Host { get => (string)Parameters["host"]; set => Parameters["host"] = value; }
 
+        /// <summary>
+        /// Name of the Event to log as per API Tools settings
+        /// </summary>
         [JsonIgnore]
         public string EventName { get => (string)Parameters["event_name"]; set => Parameters["event_name"] = value; }
 

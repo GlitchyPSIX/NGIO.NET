@@ -7,12 +7,16 @@ using Newtonsoft.Json.Linq;
 namespace NewgroundsIODotNet.Components.Responses.App
 {
     public class AppStartSessionResponse : INgioComponentResponse, INgioSessionResponse {
+        /// <inheritdoc />
         public string Component => "App.startSession";
         public bool Success { get; }
         public Dictionary<string, object> Data { get; }
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// The newly created session
+        /// </summary>
         public Session? Session { get; }
 
         [JsonConstructor]

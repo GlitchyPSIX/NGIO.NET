@@ -13,6 +13,9 @@ using NewgroundsIODotNet.Components.Responses.ScoreBoard;
 
 namespace NewgroundsIODotNet.Converters
 {
+    /// <summary>
+    /// Converts a Component Response from JSON using JSON.NET. Does not write JSON.
+    /// </summary>
     public class NgioComponentResponseConverter : JsonConverter<INgioComponentResponse> {
         private static readonly Dictionary<string, Type> TypeBinding = new Dictionary<string, Type> {
             {"Gateway.getDatetime", typeof(GatewayGetDateTimeResponse)},

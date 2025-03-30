@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.DataModels {
+    /// <summary>
+    /// Represents a user.
+    /// </summary>
     public struct User {
 
         /// <summary>

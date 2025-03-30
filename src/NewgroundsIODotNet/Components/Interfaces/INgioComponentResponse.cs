@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Interfaces
 {
+
     public interface INgioComponentResponse
     {
         /// <summary>

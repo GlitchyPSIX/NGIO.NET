@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Medal
 {
+    /// <summary>
+    /// Response to a request to get a list of Medals.
+    /// </summary>
     public class MedalListResponse : INgioComponentResponse {
         public string Component => "Medal.getList";
         public bool Success { get; }
@@ -17,6 +20,10 @@ namespace NewgroundsIODotNet.Components.Responses.Medal
         /// The App ID of <b>another</b>, approved app to load medals from.
         /// </summary>
         public string AppId { get; }
+
+        /// <summary>
+        /// List of Medals received
+        /// </summary>
         public DataModels.Medal[] Medals { get; }
 
         /// <summary>

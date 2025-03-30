@@ -6,12 +6,19 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.App
 {
+    /// <summary>
+    /// Response from a session check.
+    /// </summary>
     public class AppCheckSessionResponse : INgioComponentResponse, INgioSessionResponse {
         public string Component => "App.checkSession";
         public bool Success { get; set; }
         public Dictionary<string, object> Data { get; }
         public bool Debug { get; }
+
         public NgioServerError? Error { get; }
+        /// <summary>
+        /// Session object returned by the check.
+        /// </summary>
         public Session? Session { get; }
 
         [JsonConstructor]

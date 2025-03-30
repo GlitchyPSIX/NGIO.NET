@@ -7,6 +7,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Gateway
 {
+    /// <summary>
+    /// Response to a request to get the date and time from the server.
+    /// </summary>
     public class GatewayGetDateTimeResponse : INgioComponentResponse {
         public string Component => "Gateway.getDatetime";
         public bool Success { get; }
@@ -14,6 +17,9 @@ namespace NewgroundsIODotNet.Components.Responses.Gateway
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// The date you asked for
+        /// </summary>
         public DateTime Date { get; }
 
         /// <summary>

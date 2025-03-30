@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.App {
+    /// <summary>
+    /// Request to check if a host has permission to run the game.
+    /// </summary>
     public class AppGetHostLicenseRequest : INgioComponentRequest {
         
         public string Component => "App.getHostLicense";
@@ -10,6 +13,9 @@ namespace NewgroundsIODotNet.Components.Requests.App {
         public object Echo { get; set; }
         public bool RequiresSecureCall => false;
 
+        /// <summary>
+        /// Host address that is currently hosting the game
+        /// </summary>
         [JsonIgnore]
         public string Host { get => (string)Parameters["host"]; set => Parameters["host"] = value; }
 

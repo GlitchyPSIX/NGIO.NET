@@ -4,11 +4,18 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.Medal {
     public class MedalUnlockRequest : INgioComponentRequest {
+        /// <summary>
+        /// Request to unlock a Medal.
+        /// </summary>
+        /// <remarks>This requires a Secure Call; will not work without encryption enabled.</remarks>
         public string Component => "Medal.unlock";
         public bool RequiresSecureCall => true;
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// ID of the Medal to unlock.
+        /// </summary>
         public int MedalId {
             get => (int)Parameters["id"];
             set => Parameters["id"] = value;

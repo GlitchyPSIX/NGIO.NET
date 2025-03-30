@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Responses.App
 {
+    /// <summary>
+    /// Response from a request to end a session.
+    /// </summary>
     public class AppEndSessionResponse : INgioComponentResponse {
         public string Component => "App.endSession";
         public bool Success { get; set; }

@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.DataModels
 {
+    /// <summary>
+    /// A cry of help from the server indicating something's wrong.
+    /// </summary>
     public struct NgioServerError
     {
         [JsonProperty("code")]

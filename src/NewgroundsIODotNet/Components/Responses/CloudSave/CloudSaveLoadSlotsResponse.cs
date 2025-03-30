@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.CloudSave
 {
+    /// <summary>
+    /// Response to a request to load Cloud Save slots.
+    /// </summary>
     public class CloudSaveLoadSlotsResponse : INgioComponentResponse {
         public string Component => "CloudSave.loadSlots";
         public bool Success { get; }
@@ -17,6 +20,10 @@ namespace NewgroundsIODotNet.Components.Responses.CloudSave
         /// The App ID of <b>another</b>, approved app to load slot data from.
         /// </summary>
         public string AppId { get; }
+
+        /// <summary>
+        /// Received Cloud Save slots
+        /// </summary>
         public DataModels.SaveSlot[] Slots { get; }
 
         /// <summary>

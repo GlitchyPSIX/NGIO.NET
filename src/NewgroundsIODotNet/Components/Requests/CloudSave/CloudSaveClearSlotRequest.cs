@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.CloudSave {
+    /// <summary>
+    /// Request to empty a Cloud Save slot.
+    /// </summary>
     public class CloudSaveClearSlotRequest : INgioComponentRequest {
 
         public string Component => "CloudSave.clearSlot";
@@ -10,6 +13,9 @@ namespace NewgroundsIODotNet.Components.Requests.CloudSave {
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Save Slot ID to clear
+        /// </summary>
         [JsonIgnore]
         public int Id { get => (int)Parameters["id"]; set => Parameters["id"] = value; }
 

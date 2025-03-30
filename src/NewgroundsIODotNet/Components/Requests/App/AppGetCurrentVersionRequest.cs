@@ -3,6 +3,9 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.App {
+    /// <summary>
+    /// Request to get the current version of an app.
+    /// </summary>
     public class AppGetCurrentVersionRequest : INgioComponentRequest {
         
         public string Component => "App.getCurrentVersion";
@@ -10,6 +13,9 @@ namespace NewgroundsIODotNet.Components.Requests.App {
         public object Echo { get; set; }
         public bool RequiresSecureCall => false;
 
+        /// <summary>
+        /// Current version of the app to check with
+        /// </summary>
         [JsonIgnore]
         public string Version { get => (string)Parameters["version"]; set => Parameters["version"] = value; }
 

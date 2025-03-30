@@ -7,6 +7,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Medal
 {
+    /// <summary>
+    /// Response to a request to unlock a Medal.
+    /// </summary>
     public class MedalUnlockResponse : INgioComponentResponse {
         public string Component => "Medal.unlock";
         public bool Success { get; }

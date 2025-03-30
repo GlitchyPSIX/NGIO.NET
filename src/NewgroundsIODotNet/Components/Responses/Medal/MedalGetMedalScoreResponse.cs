@@ -7,15 +7,15 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Medal
 {
-    /// <summary>
-    /// One Loader URL response to rule them all (they all have the same response.)
-    /// </summary>
     public class MedalGetMedalScoreResponse : INgioComponentResponse {
-        public string Component => "Medal.getMedalScore"; // Nonstandard in NG documentation, but I'm making DX more fun by not exaggerating the type amount.
+        public string Component => "Medal.getMedalScore"; 
         public bool Success { get; }
         public Dictionary<string, object> Data { get; }
         public bool Debug { get; }
         public NgioServerError? Error { get; }
+        /// <summary>
+        /// Medal score of the user.
+        /// </summary>
         public int MedalScore { get; }
 
         /// <summary>

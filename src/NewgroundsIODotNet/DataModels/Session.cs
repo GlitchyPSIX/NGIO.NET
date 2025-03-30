@@ -2,6 +2,9 @@
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.DataModels {
+    /// <summary>
+    /// Represents a user's session.
+    /// </summary>
     public struct Session {
         /// <summary>
         /// If true, the session_id is expired. Use App.startSession to get a new one.
@@ -27,6 +30,9 @@ namespace NewgroundsIODotNet.DataModels {
         [JsonProperty("remember")]
         public bool RememberSession { get; }
 
+        /// <summary>
+        /// The user associated with the session.
+        /// </summary>
         [JsonProperty("user")]
         public User? User { get; }
 

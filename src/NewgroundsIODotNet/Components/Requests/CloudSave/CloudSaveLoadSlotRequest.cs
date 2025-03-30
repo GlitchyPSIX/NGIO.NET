@@ -3,17 +3,26 @@ using NewgroundsIODotNet.Components.Interfaces;
 using Newtonsoft.Json;
 
 namespace NewgroundsIODotNet.Components.Requests.CloudSave {
+    /// <summary>
+    /// Request to load up a single Cloud Save slot.
+    /// </summary>
     public class CloudSaveLoadSlotRequest : INgioComponentRequest {
         public string Component => "CloudSave.loadSlot";
         public bool RequiresSecureCall => false;
         public Dictionary<string, object> Parameters { get; }
         public object Echo { get; set; }
 
+        /// <summary>
+        /// Cloud Save slot to load
+        /// </summary>
         public int CloudSaveId {
             get => (int)Parameters["id"];
             set => Parameters["id"] = value;
         }
 
+        /// <summary>
+        /// App ID to load save slots from. Leave null to use the current app.
+        /// </summary>
         public string AppId {
             get => (string)Parameters["app_id"];
             set => Parameters["app_id"] = value;

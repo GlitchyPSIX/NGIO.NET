@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Gateway
 {
+    /// <summary>
+    /// Pong.
+    /// </summary>
     public class GatewayPingResponse : INgioComponentResponse {
         public string Component => "Gateway.ping";
         public bool Success { get; }

@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace NewgroundsIODotNet.Components.Responses.Gateway
 {
+    /// <summary>
+    /// Response to a request for NG Gateway API's version.
+    /// </summary>
     public class GatewayGetVersionResponse : INgioComponentResponse {
         public string Component => "Gateway.getVersion";
         public bool Success { get; }
@@ -13,6 +16,9 @@ namespace NewgroundsIODotNet.Components.Responses.Gateway
         public bool Debug { get; }
         public NgioServerError? Error { get; }
 
+        /// <summary>
+        /// Version of the Gateway API
+        /// </summary>
         public string Version { get; }
 
         /// <summary>
