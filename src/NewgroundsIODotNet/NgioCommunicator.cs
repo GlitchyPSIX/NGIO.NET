@@ -419,7 +419,7 @@ namespace NewgroundsIODotNet {
         /// <param name="eventId">ID of the event to log.</param>
         /// <param name="responseCallback">Callback to execute when data is received</param>
         /// <exception cref="Exception">Thrown when the operation returns unsuccessful.</exception>
-        public void LogEvent(string eventId, Action<EventLogEventResponse> responseCallback) {
+        public void LogEvent(string eventId, Action<EventLogEventResponse> responseCallback = null) {
             SendRequest(new EventLogEventRequest(_host, eventId), (response) => {
                 EventLogEventResponse evtResponse = response.GetComponentResult<EventLogEventResponse>();
                 if (!evtResponse.Success) {
