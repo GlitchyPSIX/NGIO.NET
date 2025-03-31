@@ -304,19 +304,25 @@ namespace NewgroundsIODotNet {
         /// <summary>
         /// Attempts to unlock a Medal.
         /// </summary>
-        /// <param name="medal">The Medal to unlock.</param>
+        /// <param name="medal">The Medal to unlock. If null, it throws a warning.</param>
         /// <param name="responseCallback">Callback to execute when the medal is unlocked</param>
-        public void UnlockMedal(Medal medal, Action<Medal> responseCallback = null) {
-            if (medal.Unlocked.HasValue && (bool)medal.Unlocked) return; // no use in re-unlocking an unlocked medal
+        public void UnlockMedal(Medal? medal, Action<Medal> responseCallback = null) {
+            if (medal == null) {
+                OnLogMessage("NGIO.NET: A null medal was attempted to be unlocked.", null, LogSeverity.Warning);
+                return;
+            }
+
+            Medal realMedal = medal.Value;
+            if (realMedal.Unlocked.HasValue && (bool)realMedal.Unlocked) return; // no use in re-unlocking an unlocked medal
             if (!HasUser) {
                 OnLogMessage("NGIO.NET: Medals disabled: no user.", null, LogSeverity.Warning);
                 return;
             }
-            SendRequest(new MedalUnlockRequest(medal.Id), (serverResponse) => {
+            SendRequest(new MedalUnlockRequest(realMedal.Id), (serverResponse) => {
                 MedalUnlockResponse medalResp = serverResponse.GetComponentResult<MedalUnlockResponse>();
                 if (!medalResp.Success) {
                     UserWriteFailure?.Invoke(this, medalResp);
-                    OnLogMessage($"NGIO.NET: Wasn't able to unlock medal {medal.Name}", serverResponse, LogSeverity.Error);
+                    OnLogMessage($"NGIO.NET: Wasn't able to unlock medal {realMedal.Name}", serverResponse, LogSeverity.Error);
                     return;
                 }
 
@@ -327,13 +333,13 @@ namespace NewgroundsIODotNet {
         }
 
         /// <summary>
-        /// Gets the info of a Cloud Save slot. Returns null on failure.
-        /// </summary>
-        /// <param name="id">ID of the Cloud Save slot</param>
-        /// <returns>The info for the Save Slot</returns>
-        /// <exception cref="ApplicationException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SaveSlot? GetSaveSlot(int id) {
+            /// Gets the info of a Cloud Save slot. Returns null on failure.
+            /// </summary>
+            /// <param name="id">ID of the Cloud Save slot</param>
+            /// <returns>The info for the Save Slot</returns>
+            /// <exception cref="ApplicationException"></exception>
+            /// <exception cref="ArgumentException"></exception>
+            public SaveSlot? GetSaveSlot(int id) {
             if (!HasUser) {
                 OnLogMessage("NGIO.NET: Save Slots disabled: no user.", null, LogSeverity.Warning);
                 return null;
@@ -588,8 +594,14 @@ namespace NewgroundsIODotNet {
                 ConnectionStatus == ConnectionStatus.LoginCancelled ||
                 ConnectionStatus == ConnectionStatus.UserLoggedOut ||
                 ConnectionStatus == ConnectionStatus.LoginFailed) {
+                LoginPageOpen = true;
                 SendRequest(new AppStartSessionRequest(false), response => {
-                    LoginPageOpen = true;
+                    // this in case appstartsession fails
+                    if (!response.GetComponentResult<AppStartSessionResponse>().Success) {
+                        LoginPageOpen = false;
+                        OnLogMessage("NGIO.NET: Starting a session failed when asked to log in.", null, LogSeverity.Warning);
+                        return;
+                    }
                     OpenLoginPage();
                 });
             }
