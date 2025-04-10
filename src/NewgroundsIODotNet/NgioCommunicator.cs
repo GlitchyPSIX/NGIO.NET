@@ -923,8 +923,14 @@ namespace NewgroundsIODotNet {
                 Session = null;
                 if (sessionResponse is AppCheckSessionResponse checkSess) {
                     if (ConnectionStatus == ConnectionStatus.LoginRequired && LoginPageOpen && !checkSess.Success) {
+                        // logging in, cancelled
                         ConnectionStatus = ConnectionStatus.LoginCancelled;
                         LoginPageOpen = false;
+                    }
+
+                    if (ConnectionStatus == ConnectionStatus.LocalVersionChecked && !checkSess.Success) {
+                        // initializing, given session invalid
+                        ConnectionStatus = ConnectionStatus.LoginRequired;
                     }
                 }
                 return;
