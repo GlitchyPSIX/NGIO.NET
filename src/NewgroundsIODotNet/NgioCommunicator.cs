@@ -639,7 +639,7 @@ namespace NewgroundsIODotNet {
         public void SkipLogin() {
             if (ConnectionStatus == ConnectionStatus.Ready) return;
             if (ConnectionStatus != ConnectionStatus.LoginRequired
-                || ConnectionStatus != ConnectionStatus.LoginCancelled) {
+                && ConnectionStatus != ConnectionStatus.LoginCancelled) {
                 OnLogMessage("NGIO.NET: attempted to skip login without login required",
                     null, LogSeverity.Warning);
                 return;
