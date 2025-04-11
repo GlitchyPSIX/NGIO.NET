@@ -209,6 +209,7 @@ namespace NewgroundsIODotNet {
         protected string _host;
         protected bool _logViewOnInit;
         protected bool _heartbeatPending;
+        protected bool _waitingStartSessionResponse;
 
 
         /// <summary>
@@ -577,7 +578,7 @@ namespace NewgroundsIODotNet {
             LoginSkipped = false;
             Session = null;
             CurrentUser = null;
-            ConnectionStatus = ConnectionStatus.Initialized;
+            ConnectionStatus = ConnectionStatus.Uninitialized;
 
             LastScoresResult = null;
             LastUnlockedMedal = null;
@@ -595,6 +596,7 @@ namespace NewgroundsIODotNet {
                 ConnectionStatus == ConnectionStatus.UserLoggedOut ||
                 ConnectionStatus == ConnectionStatus.LoginFailed) {
                 LoginPageOpen = true;
+                _waitingStartSessionResponse = true;
                 SendRequest(new AppStartSessionRequest(false), response => {
                     // this in case appstartsession fails
                     if (!response.GetComponentResult<AppStartSessionResponse>().Success) {
@@ -607,6 +609,7 @@ namespace NewgroundsIODotNet {
             }
             else {
                 LoginPageOpen = true;
+                _waitingStartSessionResponse = false;
                 OpenLoginPage();
             }
         }
@@ -919,10 +922,13 @@ namespace NewgroundsIODotNet {
         }
 
         protected void HandleSessionResponse(INgioSessionResponse sessionResponse) {
-            if (sessionResponse.Session == null) { // Zero session at all, should start again
+            if (sessionResponse.Session == null && !_waitingStartSessionResponse) 
+            { // Zero session at all, should start again, but wait until startsession does its thing
                 Session = null;
                 if (sessionResponse is AppCheckSessionResponse checkSess) {
-                    if (ConnectionStatus == ConnectionStatus.LoginRequired && LoginPageOpen && !checkSess.Success) {
+                    if (ConnectionStatus == ConnectionStatus.LoginRequired
+                        && LoginPageOpen
+                        && !checkSess.Success) {
                         // logging in, cancelled
                         ConnectionStatus = ConnectionStatus.LoginCancelled;
                         LoginPageOpen = false;
@@ -933,7 +939,12 @@ namespace NewgroundsIODotNet {
                         ConnectionStatus = ConnectionStatus.LoginRequired;
                     }
                 }
+
                 return;
+            }
+
+            if (sessionResponse is AppStartSessionResponse startSess) {
+                _waitingStartSessionResponse = false;
             }
 
             if (Session != null) { // Existing session 
@@ -959,7 +970,8 @@ namespace NewgroundsIODotNet {
                 Session receivedSession = sessionResponse.Session.Value;
 
                 if (ConnectionStatus != ConnectionStatus.LocalVersionChecked &&
-                    ConnectionStatus != ConnectionStatus.LoginRequired) return;
+                    ConnectionStatus != ConnectionStatus.LoginRequired 
+                    && ConnectionStatus != ConnectionStatus.LoginCancelled) return;
 
                 Session = sessionResponse.Session;
 
