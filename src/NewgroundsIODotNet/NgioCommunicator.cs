@@ -971,7 +971,8 @@ namespace NewgroundsIODotNet {
 
                 if (ConnectionStatus != ConnectionStatus.LocalVersionChecked &&
                     ConnectionStatus != ConnectionStatus.LoginRequired 
-                    && ConnectionStatus != ConnectionStatus.LoginCancelled) return;
+                    && ConnectionStatus != ConnectionStatus.LoginCancelled
+                    && ConnectionStatus != ConnectionStatus.UserLoggedOut) return; // TODO: Simplify those enum checks into one
 
                 Session = sessionResponse.Session;
 
