@@ -598,6 +598,10 @@ namespace NewgroundsIODotNet {
                 LoginPageOpen = true;
                 _waitingStartSessionResponse = true;
                 SendRequest(new AppStartSessionRequest(false), response => {
+                    if (response == null) {
+                        // What happened here? NG is probably down.
+                        return;
+                    }
                     // this in case appstartsession fails
                     if (!response.GetComponentResult<AppStartSessionResponse>().Success) {
                         LoginPageOpen = false;
@@ -877,6 +881,7 @@ namespace NewgroundsIODotNet {
         }
 
         protected void ReceiveVersionCheck(NgioServerResponse resp) {
+            if (resp == null) return; // NG is probably down. Don't continue.
 
             if (!(IsLatestVersion && LegalHost)) {
                 ConnectionStatus = ConnectionStatus.Ready; // after server response, host is not legal, game is ready but latestver/legalhost should take prec
